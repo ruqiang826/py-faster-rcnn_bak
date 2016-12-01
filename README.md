@@ -215,3 +215,9 @@ Test outputs are saved under:
 ```
 output/<experiment directory>/<dataset name>/<network snapshot name>/
 ```
+
+这个代码有9个月没有更新了，版本上有些问题： cudnn升级到5, 这里对应的应该是4,所以自带的caffe和cudnn不匹配了，编译不过。caffe主线上已经升级到cudnn 5了。所以可以把caffe 最新版拷过来，覆盖这里的caffe。
+但是这里的caffe有些代码在主线里没有，需要再拷贝。 有./src/caffe/layers/smooth_L1_loss_layer* 和  ./src/caffe/layers/roi_pooling_layer.*  include/caffe/fast_rcnn_layers.hpp 
+src/caffe/proto/caffe.proto 需要加两个声明,对应上面这两个类, 重新cmake、make
+
+另外，./include/caffe/layers/python_layer.hpp  的一个接口变了，param_str_ 改成 param_str，training的时候遇到这个接口的文件,改一下。改fast rcnn而不要去改caffe。
