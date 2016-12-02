@@ -221,3 +221,8 @@ output/<experiment directory>/<dataset name>/<network snapshot name>/
 src/caffe/proto/caffe.proto 需要加两个声明,对应上面这两个类, 重新cmake、make
 
 另外，./include/caffe/layers/python_layer.hpp  的一个接口变了，param_str_ 改成 param_str，training的时候遇到这个接口的文件,改一下。改fast rcnn而不要去改caffe。
+
+另外，./lib/rpn/proposal_layer.py 里面有个cfg_key传不过来，导致报错， 强行改成TRAIN。
+有部分输出文件为空，导致一个叫BB的变量错误，先在调用处./lib/datasets/pascal_voc.py 加了异常判断，可以把那些空文件绕过去。
+
+这样，train 和test都可以跑过了。这些问题后面再继续解。
