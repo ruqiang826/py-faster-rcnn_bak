@@ -226,3 +226,7 @@ src/caffe/proto/caffe.proto 需要加两个声明,对应上面这两个类, 重�
 有部分输出文件为空，导致一个叫BB的变量错误，先在调用处./lib/datasets/pascal_voc.py 加了异常判断，可以把那些空文件绕过去。
 
 这样，train 和test都可以跑过了。这些问题后面再继续解。
+
+最后如何运行，看run.sh 
+
+train的iter数在./experiments/scripts/faster_rcnn_end2end.sh 改

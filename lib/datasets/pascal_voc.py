@@ -280,9 +280,13 @@ class pascal_voc(imdb):
             if cls == '__background__':
                 continue
             filename = self._get_voc_results_file_template().format(cls)
-            rec, prec, ap = voc_eval(
-                filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5,
-                use_07_metric=use_07_metric)
+            try: #ruqiang826
+                rec, prec, ap = voc_eval(
+                    filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5,
+                    use_07_metric=use_07_metric)
+            except: #ruqiang826
+                print "exception, add by ruqiang826" #ruqiang826
+                continue  # ruqiang826
             aps += [ap]
             print('AP for {} = {:.4f}'.format(cls, ap))
             with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:

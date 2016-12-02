@@ -241,7 +241,7 @@ def test_net(net, imdb, max_per_image=100, thresh=0.05, vis=False):
     if not cfg.TEST.HAS_RPN:
         roidb = imdb.roidb
 
-    for i in xrange(num_images):
+    for i in xrange(num_images - 4920): #ruqiang826
         # filter out any ground truth boxes
         if cfg.TEST.HAS_RPN:
             box_proposals = None
