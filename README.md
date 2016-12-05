@@ -230,3 +230,8 @@ src/caffe/proto/caffe.proto 需要加两个声明,对应上面这两个类, 重�
 最后如何运行，看run.sh 
 
 train的iter数在./experiments/scripts/faster_rcnn_end2end.sh 改
+
+##代码栈
+1. tools/train_net.py  是入口
+2. 处理数据在get_imdb里，进去看到datasets.factory， 一些逻辑在lambda表达式的pascal_voc 的init函数里。看这个函数，其实只有一些初始赋值逻辑，没有什么数据处理的逻辑。想看train数据的格式以及处理，这才是train自己数据的关键
+3. 退回到train_net.py，看get_roidb 和 get_training_roidb, lib/roi_data_layer/roidb

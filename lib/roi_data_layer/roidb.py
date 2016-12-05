@@ -12,6 +12,7 @@ from fast_rcnn.config import cfg
 from fast_rcnn.bbox_transform import bbox_transform
 from utils.cython_bbox import bbox_overlaps
 import PIL
+import pdb
 
 def prepare_roidb(imdb):
     """Enrich the imdb's roidb by adding some derived quantities that
@@ -24,6 +25,7 @@ def prepare_roidb(imdb):
              for i in xrange(imdb.num_images)]
     roidb = imdb.roidb
     for i in xrange(len(imdb.image_index)):
+        pdb.set_trace()
         roidb[i]['image'] = imdb.image_path_at(i)
         roidb[i]['width'] = sizes[i][0]
         roidb[i]['height'] = sizes[i][1]

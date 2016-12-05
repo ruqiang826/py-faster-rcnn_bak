@@ -342,6 +342,7 @@ class pascal_voc(imdb):
             self.config['cleanup'] = True
 
 if __name__ == '__main__':
+    print "#################### in pascal_voc main"
     from datasets.pascal_voc import pascal_voc
     d = pascal_voc('trainval', '2007')
     res = d.roidb

@@ -17,7 +17,7 @@ import numpy as np
 for year in ['2007', '2012']:
     for split in ['train', 'val', 'trainval', 'test']:
         name = 'voc_{}_{}'.format(year, split)
-        __sets[name] = (lambda split=split, year=year: pascal_voc(split, year))
+        __sets[name] = (lambda split=split, year=year: pascal_voc(split, year)) # theres are all lambda functions in sets. while get item from sets, in get_imdb, return a sets[name]() , it's a pascal_voc class.  why design like this???
 
 # Set up coco_2014_<split>
 for year in ['2014']:

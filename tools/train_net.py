@@ -73,7 +73,9 @@ def combined_roidb(imdb_names):
             roidb.extend(r)
         imdb = datasets.imdb.imdb(imdb_names)
     else:
-        imdb = get_imdb(imdb_names)
+        imdb = get_imdb(imdb_names)  # imdb is a pascal_voc class, it has functions :
+#['__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_class_to_ind', '_classes', '_comp_id', '_data_path', '_devkit_path', '_do_matlab_eval', '_do_python_eval', '_get_comp_id', '_get_default_path', '_get_voc_results_file_template', '_get_widths', '_image_ext', '_image_index', '_image_set', '_load_image_set_index', '_load_pascal_annotation', '_load_rpn_roidb', '_load_selective_search_roidb', '_name', '_num_classes', '_obj_proposer', '_roidb', '_roidb_handler', '_salt', '_write_voc_results_file', '_year', 'append_flipped_images', 'cache_path', 'classes', 'competition_mode', 'config', 'create_roidb_from_box_list', 'default_roidb', 'evaluate_detections', 'evaluate_recall', 'gt_roidb', 'image_index', 'image_path_at', 'image_path_from_index', 'merge_roidbs', 'name', 'num_classes', 'num_images', 'roidb', 'roidb_handler', 'rpn_roidb', 'selective_search_roidb', 'set_proposal_method']
+        
     return imdb, roidb
 
 if __name__ == '__main__':
@@ -103,6 +105,7 @@ if __name__ == '__main__':
 
     imdb, roidb = combined_roidb(args.imdb_name)
     print '{:d} roidb entries'.format(len(roidb))
+    sys.exit(-1)  #ruqiang826
 
     output_dir = get_output_dir(imdb)
     print 'Output will be saved to `{:s}`'.format(output_dir)
