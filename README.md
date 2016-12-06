@@ -233,5 +233,22 @@ train的iter数在./experiments/scripts/faster_rcnn_end2end.sh 改
 
 ##代码栈
 1. tools/train_net.py  是入口
-2. 处理数据在get_imdb里，进去看到datasets.factory， 一些逻辑在lambda表达式的pascal_voc 的init函数里。看这个函数，其实只有一些初始赋值逻辑，没有什么数据处理的逻辑。想看train数据的格式以及处理，这才是train自己数据的关键
-3. 退回到train_net.py，看get_roidb 和 get_training_roidb, lib/roi_data_layer/roidb
+2. 首要目标是找到train数据的逻辑。
+  train_net.py 
+    -> from datasets.factory import get_imdb  这里其实执行了factory.py，初始化了imdb的__sets。注意初始化只是一个lambda表达式，下面get_imdb的时候才执行lambda表达式.
+    -> combined_roidb  ..
+    -> get_roidb   ..
+      -> get_imdb  只是返回了刚才初始化好的imdb sets中的一个元素。这里执行了lambda表达式，获取了一个pascal_voc的类。先执行了imdb的init函数，又执行自己的init函数
+      -> set_proposal_method 这是pascal_vod的基类imdb的函数，在lib/datasets/imdb.py， 这里把roidb_handler 设置成了 gt_roidb，稍后就会执行到，这个是数据处理的关键。
+      -> get_training_roidb 在 lib/fast_rcnn/train.py。
+        -> imdb.append_flipped_images() 还是在imdb.py。 
+          -> self.roidb[i]['boxes'].copy() 首次调用roidb，
+            -> imdb.py 的 roidb(self)。如果已经调用过，roidb就可以直接返回了。如果没有调用过，走下面：
+              -> self.roidb_handler() 这个就是gt_roidb了,这玩意在上面set的，找了好久.
+                -> lib/datasets/pascal_voc.py:gt_roidb()
+                  -> _load_pascal_annotation : 在VOCdevkit2007/VOC2007/Annotations 目录下，有每个jpg的xml标注，包括了object的范围和类别. 这个函数返回了每个图片的object 坐标、object类别、overlaps(第一维是object id，第二维是类别), object区域面积
+          -> 回到append_flipped_images()，这个是翻转图像，多得到两张图片
+      -> 回到get_training_roidb 
+        -> lib/roi_data_layer/roidb.py:prepare_roidb
+
+3. 退回到train_net.py

@@ -18,6 +18,7 @@ import subprocess
 import uuid
 from voc_eval import voc_eval
 from fast_rcnn.config import cfg
+import pdb
 
 class pascal_voc(imdb):
     def __init__(self, image_set, year, devkit_path=None):
@@ -82,6 +83,7 @@ class pascal_voc(imdb):
                 'Path does not exist: {}'.format(image_set_file)
         with open(image_set_file) as f:
             image_index = [x.strip() for x in f.readlines()]
+
         return image_index
 
     def _get_default_path(self):
@@ -212,11 +214,12 @@ class pascal_voc(imdb):
             cls = self._class_to_ind[obj.find('name').text.lower().strip()]
             boxes[ix, :] = [x1, y1, x2, y2]
             gt_classes[ix] = cls
-            overlaps[ix, cls] = 1.0
+            overlaps[ix, cls] = 1.0  #第一维是object序号，第二维是类别，非常稀疏
             seg_areas[ix] = (x2 - x1 + 1) * (y2 - y1 + 1)
 
-        overlaps = scipy.sparse.csr_matrix(overlaps)
+        overlaps = scipy.sparse.csr_matrix(overlaps) # scipy的矩阵压缩。Compressed Sparse Row format
 
+        pdb.set_trace()
         return {'boxes' : boxes,
                 'gt_classes': gt_classes,
                 'gt_overlaps' : overlaps,
