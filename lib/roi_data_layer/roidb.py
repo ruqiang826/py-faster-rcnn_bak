@@ -35,6 +35,10 @@ def prepare_roidb(imdb):
         max_classes = gt_overlaps.argmax(axis=1)
         roidb[i]['max_classes'] = max_classes
         roidb[i]['max_overlaps'] = max_overlaps
+#(Pdb) max_overlaps
+#array([ 1.,  1.,  1.], dtype=float32)
+#(Pdb) max_classes
+#array([9, 9, 9])
         # sanity checks
         # max overlap of 0 => class should be zero (background)
         zero_inds = np.where(max_overlaps == 0)[0]

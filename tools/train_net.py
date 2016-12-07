@@ -108,7 +108,6 @@ if __name__ == '__main__':
 
     output_dir = get_output_dir(imdb)
     print 'Output will be saved to `{:s}`'.format(output_dir)
-    sys.exit(-1)  #ruqiang826
 
     train_net(args.solver, roidb, output_dir,
               pretrained_model=args.pretrained_model,

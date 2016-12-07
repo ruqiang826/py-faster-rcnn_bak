@@ -1,3 +1,4 @@
+#coding=utf8
 # --------------------------------------------------------
 # Fast R-CNN
 # Copyright (c) 2015 Microsoft
@@ -18,7 +19,6 @@ import subprocess
 import uuid
 from voc_eval import voc_eval
 from fast_rcnn.config import cfg
-import pdb
 
 class pascal_voc(imdb):
     def __init__(self, image_set, year, devkit_path=None):
@@ -219,7 +219,6 @@ class pascal_voc(imdb):
 
         overlaps = scipy.sparse.csr_matrix(overlaps) # scipy的矩阵压缩。Compressed Sparse Row format
 
-        pdb.set_trace()
         return {'boxes' : boxes,
                 'gt_classes': gt_classes,
                 'gt_overlaps' : overlaps,
