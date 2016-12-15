@@ -18,6 +18,7 @@ from fast_rcnn.nms_wrapper import nms
 import cPickle
 from utils.blob import im_list_to_blob
 import os
+import pdb
 
 def _get_image_blob(im):
     """Converts an image into a network input.
@@ -234,6 +235,7 @@ def test_net(net, imdb, max_per_image=100, thresh=0.05, vis=False):
                  for _ in xrange(imdb.num_classes)]
 
     output_dir = get_output_dir(imdb, net)
+    print "output_dir: ",output_dir
 
     # timers
     _t = {'im_detect' : Timer(), 'misc' : Timer()}
@@ -259,11 +261,17 @@ def test_net(net, imdb, max_per_image=100, thresh=0.05, vis=False):
         _t['im_detect'].toc()
 
         _t['misc'].tic()
+        #pdb.set_trace()
         # skip j = 0, because it's the background class
+        box_num = 0
         for j in xrange(1, imdb.num_classes):
             inds = np.where(scores[:, j] > thresh)[0]
             cls_scores = scores[inds, j]
             cls_boxes = boxes[inds, j*4:(j+1)*4]
+            if cls_boxes.shape == (1,4):
+                cv2.rectangle(im,(cls_boxes[0,0],cls_boxes[0,1]),(cls_boxes[0,2],cls_boxes[0,3]),(0,0,255),2)
+                box_num += 1
+               
             cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
                 .astype(np.float32, copy=False)
             keep = nms(cls_dets, cfg.TEST.NMS)
@@ -271,6 +279,9 @@ def test_net(net, imdb, max_per_image=100, thresh=0.05, vis=False):
             if vis:
                 vis_detections(im, imdb.classes[j], cls_dets)
             all_boxes[j][i] = cls_dets
+        cv2.imwrite('/tmp/%d.jpg' % i, im)
+        if box_num == 0:
+            print "%d image has no box" % i
 
         # Limit to max_per_image detections *over all classes*
         if max_per_image > 0:

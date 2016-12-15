@@ -5,4 +5,4 @@
 
 #Wrote snapshot to: /home/ruqiang/github/py-faster-rcnn/output/faster_rcnn_end2end/voc_2007_trainval/vgg_cnn_m_1024_faster_rcnn_iter_700.caffemodel
 
-./tools/test_net.py --gpu 0 --def models/pascal_voc/VGG_CNN_M_1024/faster_rcnn_end2end/test.prototxt --net /home/ruqiang/github/py-faster-rcnn/output/faster_rcnn_end2end/voc_2007_trainval/vgg_cnn_m_1024_faster_rcnn_iter_700.caffemodel --imdb voc_2007_test --cfg experiments/cfgs/faster_rcnn_end2end.yml
+./tools/test_net.py --gpu 0 --def models/pascal_voc/VGG_CNN_M_1024/faster_rcnn_end2end/test.prototxt --net /home/ruqiang/github/py-faster-rcnn_ruqiang826/output/faster_rcnn_end2end/voc_2007_trainval/vgg_cnn_m_1024_faster_rcnn_iter_700.caffemodel --imdb voc_2007_test --cfg experiments/cfgs/faster_rcnn_end2end.yml
