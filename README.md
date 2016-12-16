@@ -256,4 +256,10 @@ train的iter数在./experiments/scripts/faster_rcnn_end2end.sh 改
 
 3. main 的下一步是 lib/fast_rcnn/train.py:train_net
   -> filter_roidb: 这里大致的逻辑是，如果是少数object，认为是foreground， 如果是多个同类型object ，认为是background 。无论那个，至少得有满足数量的object。这里没太仔细看。
+  fast rcnn的逻辑应该在上面跑通阶段，拷过去的两个cpp文件roi_pooling_layer. 这是自己的逻辑和caffe框架merge的地方。没有看这里。
+
+4. 先看test_net.py
+  找到test的地方，获取预测的边界的地方。用cv2.rectangle 和 cv2.imwrite 把画了框的图像保存下来。
+
+
   
