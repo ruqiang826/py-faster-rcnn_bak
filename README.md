@@ -261,5 +261,7 @@ train的iter数在./experiments/scripts/faster_rcnn_end2end.sh 改
 4. 先看test_net.py
   找到test的地方，获取预测的边界的地方。用cv2.rectangle 和 cv2.imwrite 把画了框的图像保存下来。
 
+5. 替换自己的数据
+
 
   
