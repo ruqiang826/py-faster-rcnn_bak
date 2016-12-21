@@ -232,34 +232,34 @@ src/caffe/proto/caffe.proto 需要加两个声明,对应上面这两个类, 重�
 train的iter数在./experiments/scripts/faster_rcnn_end2end.sh 改
 
 ##代码栈
-1. tools/train_net.py  是入口
-2. 首要目标是找到train数据的逻辑。
-  train_net.py 
-    -> from datasets.factory import get_imdb  这里其实执行了factory.py，初始化了imdb的__sets。注意初始化只是一个lambda表达式，下面get_imdb的时候才执行lambda表达式.
-    -> tools/train_net.py:combined_roidb  ..
-    -> tools/train_net.py:get_roidb   ..
-      -> get_imdb  只是返回了刚才初始化好的imdb sets中的一个元素。这里执行了lambda表达式，获取了一个pascal_voc的类。先执行了imdb的init函数，又执行自己的init函数
-      -> set_proposal_method 这是pascal_vod的基类imdb的函数，在lib/datasets/imdb.py， 这里把roidb_handler 设置成了 gt_roidb，稍后就会执行到，这个是数据处理的关键。
-      -> get_training_roidb 在 lib/fast_rcnn/train.py。
-        -> imdb.append_flipped_images() 还是在imdb.py。 
-          -> self.roidb[i]['boxes'].copy() 首次调用roidb，
-            -> imdb.py 的 roidb(self)。如果已经调用过，roidb就可以直接返回了。如果没有调用过，走下面：
-              -> self.roidb_handler() 这个就是gt_roidb了,这玩意在上面set的，找了好久.
-                -> lib/datasets/pascal_voc.py:gt_roidb()
-                  -> _load_pascal_annotation : 在VOCdevkit2007/VOC2007/Annotations 目录下，有每个jpg的xml标注，包括了object的范围和类别. 这个函数返回了每个图片的object 坐标、object类别、overlaps(第一维是object id，第二维是类别), object区域面积
-          -> 回到append_flipped_images()，这个是翻转图像，多得到两张图片
-      -> 回到 lib/fast_rcnn/train.py:get_training_roidb 
-        -> lib/roi_data_layer/roidb.py:prepare_roidb:对每张图像增加了max_classes 和 max_overlaps两个变量。还不清楚这两个是做什么的。
-    -> 回到 tools/train_net.py:combined_roidb ,后面对多个imdb的情况做了处理，然后返回imdb、roidb。 
-    -> 回到tools/train_net.py:main。数据处理完毕。
-    另外，数据标注在github上有个工具，tzutalin/labelImg，输出就是PASCAL VOC格式。
-
-3. main 的下一步是 lib/fast_rcnn/train.py:train_net
-  -> filter_roidb: 这里大致的逻辑是，如果是少数object，认为是foreground， 如果是多个同类型object ，认为是background 。无论那个，至少得有满足数量的object。这里没太仔细看。
-  fast rcnn的逻辑应该在上面跑通阶段，拷过去的两个cpp文件roi_pooling_layer. 这是自己的逻辑和caffe框架merge的地方。没有看这里。
-
-4. 先看test_net.py
-  找到test的地方，获取预测的边界的地方。用cv2.rectangle 和 cv2.imwrite 把画了框的图像保存下来。
+1. tools/train_net.py  是入口  
+2. 首要目标是找到train数据的逻辑。  
+  train_net.py   
+    -> from datasets.factory import get_imdb  这里其实执行了factory.py，初始化了imdb的__sets。注意初始化只是一个lambda表达式，下面get_imdb的时候才执行lambda表达式.  
+    -> tools/train_net.py:combined_roidb  ..  
+    -> tools/train_net.py:get_roidb   ..  
+      -> get_imdb  只是返回了刚才初始化好的imdb sets中的一个元素。这里执行了lambda表达式，获取了一个pascal_voc的类。先执行了imdb的init函数，又执行自己的init函数  
+      -> set_proposal_method 这是pascal_vod的基类imdb的函数，在lib/datasets/imdb.py， 这里把roidb_handler 设置成了 gt_roidb，稍后就会执行到，这个是数据处理的关键。  
+      -> get_training_roidb 在 lib/fast_rcnn/train.py。  
+        -> imdb.append_flipped_images() 还是在imdb.py。   
+          -> self.roidb[i]['boxes'].copy() 首次调用roidb，  
+            -> imdb.py 的 roidb(self)。如果已经调用过，roidb就可以直接返回了。如果没有调用过，走下面：  
+              -> self.roidb_handler() 这个就是gt_roidb了,这玩意在上面set的，找了好久.  
+                -> lib/datasets/pascal_voc.py:gt_roidb()  
+                  -> _load_pascal_annotation : 在VOCdevkit2007/VOC2007/Annotations 目录下，有每个jpg的xml标注，包括了object的范围和类别. 这个函数返回了每个图片的object 坐标、object类别、overlaps(第一维是object id，第二维是类别), object区域面积  
+          -> 回到append_flipped_images()，这个是翻转图像，多得到两张图片  
+      -> 回到 lib/fast_rcnn/train.py:get_training_roidb   
+        -> lib/roi_data_layer/roidb.py:prepare_roidb:对每张图像增加了max_classes 和 max_overlaps两个变量。还不清楚这两个是做什么的。  
+    -> 回到 tools/train_net.py:combined_roidb ,后面对多个imdb的情况做了处理，然后返回imdb、roidb。   
+    -> 回到tools/train_net.py:main。数据处理完毕。  
+    另外，数据标注在github上有个工具，tzutalin/labelImg，输出就是PASCAL VOC格式。  
+  
+3. main 的下一步是 lib/fast_rcnn/train.py:train_net  
+  -> filter_roidb: 这里大致的逻辑是，如果是少数object，认为是foreground， 如果是多个同类型object ，认为是background 。无论那个，至少得有满足数量的object。这里没太仔细看。  
+  fast rcnn的逻辑应该在上面跑通阶段，拷过去的两个cpp文件roi_pooling_layer. 这是自己的逻辑和caffe框架merge的地方。没有看这里。  
+  
+4. 先看test_net.py  
+  找到test的地方，获取预测的边界的地方。用cv2.rectangle 和 cv2.imwrite 把画了框的图像保存下来。  
 
 5. 替换自己的数据
 
