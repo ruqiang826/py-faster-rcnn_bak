@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 import os
 import cPickle
 import numpy as np
+import pdb
 
 def parse_rec(filename):
     """ Parse a PASCAL VOC xml file """
@@ -102,6 +103,7 @@ def voc_eval(detpath,
         lines = f.readlines()
     imagenames = [x.strip() for x in lines]
 
+    # ruqiang826 do not cache. for debug
     if not os.path.isfile(cachefile):
         # load annots
         recs = {}
@@ -112,8 +114,8 @@ def voc_eval(detpath,
                     i + 1, len(imagenames))
         # save
         print 'Saving cached annotations to {:s}'.format(cachefile)
-        with open(cachefile, 'w') as f:
-            cPickle.dump(recs, f)
+        #with open(cachefile, 'w') as f:
+        #    cPickle.dump(recs, f)
     else:
         # load
         with open(cachefile, 'r') as f:
@@ -136,6 +138,8 @@ def voc_eval(detpath,
     detfile = detpath.format(classname)
     with open(detfile, 'r') as f:
         lines = f.readlines()
+    if len(lines) == 0:
+        print "file [%s] has no content, may cause exception." % detfile
 
     splitlines = [x.strip().split(' ') for x in lines]
     image_ids = [x[0] for x in splitlines]

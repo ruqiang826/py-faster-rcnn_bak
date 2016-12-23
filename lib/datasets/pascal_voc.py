@@ -19,6 +19,7 @@ import subprocess
 import uuid
 from voc_eval import voc_eval
 from fast_rcnn.config import cfg
+import pdb
 
 class pascal_voc(imdb):
     def __init__(self, image_set, year, devkit_path=None):
@@ -67,6 +68,11 @@ class pascal_voc(imdb):
         """
         image_path = os.path.join(self._data_path, 'JPEGImages',
                                   index + self._image_ext)
+        print image_path
+        if os.path.exists(image_path) == False:  #ruqiang826
+            image_path = os.path.join(self._data_path, 'JPEGImages',
+                                  index + '.png')
+          
         assert os.path.exists(image_path), \
                 'Path does not exist: {}'.format(image_path)
         return image_path
@@ -99,11 +105,12 @@ class pascal_voc(imdb):
         This function loads/saves from/to a cache file to speed up future calls.
         """
         cache_file = os.path.join(self.cache_path, self.name + '_gt_roidb.pkl')
-        if os.path.exists(cache_file):
-            with open(cache_file, 'rb') as fid:
-                roidb = cPickle.load(fid)
-            print '{} gt roidb loaded from {}'.format(self.name, cache_file)
-            return roidb
+        #ruqiang826 .do not use cache
+        #if os.path.exists(cache_file):
+        #    with open(cache_file, 'rb') as fid:
+        #        roidb = cPickle.load(fid)
+        #    print '{} gt roidb loaded from {}'.format(self.name, cache_file)
+        #    return roidb
 
         gt_roidb = [self._load_pascal_annotation(index)
                     for index in self.image_index]
@@ -123,11 +130,12 @@ class pascal_voc(imdb):
         cache_file = os.path.join(self.cache_path,
                                   self.name + '_selective_search_roidb.pkl')
 
-        if os.path.exists(cache_file):
-            with open(cache_file, 'rb') as fid:
-                roidb = cPickle.load(fid)
-            print '{} ss roidb loaded from {}'.format(self.name, cache_file)
-            return roidb
+        # ruqiang826. do not cache
+        #if os.path.exists(cache_file):
+        #    with open(cache_file, 'rb') as fid:
+        #        roidb = cPickle.load(fid)
+        #    print '{} ss roidb loaded from {}'.format(self.name, cache_file)
+        #    return roidb
 
         if int(self._year) == 2007 or self._image_set != 'test':
             gt_roidb = self.gt_roidb()
@@ -218,6 +226,7 @@ class pascal_voc(imdb):
             seg_areas[ix] = (x2 - x1 + 1) * (y2 - y1 + 1)
 
         overlaps = scipy.sparse.csr_matrix(overlaps) # scipy的矩阵压缩。Compressed Sparse Row format
+        #pdb.set_trace()
 
         return {'boxes' : boxes,
                 'gt_classes': gt_classes,

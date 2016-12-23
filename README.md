@@ -226,6 +226,9 @@ src/caffe/proto/caffe.proto 需要加两个声明,对应上面这两个类, 重�
 有部分输出文件为空，导致一个叫BB的变量错误，先在调用处./lib/datasets/pascal_voc.py 加了异常判断，可以把那些空文件绕过去。
 
 这样，train 和test都可以跑过了。这些问题后面再继续解。
+另外注意train和test都会生成cache文件，两次运行改了图片内容，注意删掉cache，否则会报错。
+这是train的cache：/home/ruqiang/github/py-faster-rcnn_ruqiang826/data/cache/voc_2007_trainval_gt_roidb.pkl
+test cache :      /home/ruqiang/github/py-faster-rcnn_ruqiang826/data/VOCdevkit2007/annotations_cache/annots.pkl
 
 最后如何运行，看run.sh 
 
@@ -238,7 +241,7 @@ train的iter数在./experiments/scripts/faster_rcnn_end2end.sh 改
     -> from datasets.factory import get_imdb  这里其实执行了factory.py，初始化了imdb的__sets。注意初始化只是一个lambda表达式，下面get_imdb的时候才执行lambda表达式.  
     -> tools/train_net.py:combined_roidb  ..  
     -> tools/train_net.py:get_roidb   ..  
-      -> get_imdb  只是返回了刚才初始化好的imdb sets中的一个元素。这里执行了lambda表达式，获取了一个pascal_voc的类。先执行了imdb的init函数，又执行自己的init函数  
+      -> lib/datasets/factory.py:get_imdb  只是返回了刚才初始化好的imdb sets中的一个元素。这里执行了lambda表达式，获取了一个pascal_voc的类。先执行了imdb的init函数，又执行自己的init函数  
       -> set_proposal_method 这是pascal_vod的基类imdb的函数，在lib/datasets/imdb.py， 这里把roidb_handler 设置成了 gt_roidb，稍后就会执行到，这个是数据处理的关键。  
       -> get_training_roidb 在 lib/fast_rcnn/train.py。  
         -> imdb.append_flipped_images() 还是在imdb.py。   
@@ -262,6 +265,11 @@ train的iter数在./experiments/scripts/faster_rcnn_end2end.sh 改
   找到test的地方，获取预测的边界的地方。用cv2.rectangle 和 cv2.imwrite 把画了框的图像保存下来。  
 
 5. 替换自己的数据
-
+   运行中的问题。
+   a 想替换自己的数据集，用labelImg标注了十几个，发现test时根本没结果。不知道是不是标注集合太少的原因。
+   b 想用原始数据集合抽一小部分来做。也不行。
+   c 运行过程中，有些问题需要注意。一个是train和test都是有cache，一定注意清理cache，否则读取的图片是cache的结果。train文件和test文件都是在data/mytestdata/VOC2007/ImageSets/Main/trainval.txt 和test.txt里写的。所以运行要注意 拷文件、清cache、更新trainval.txt和test.txt再运行
+   d 在把上面的东西都替换顺当以后，把train和test都改成了20个jpg，运行正常，可以输出region的判定结果。多数图片无结果，有结果的也不一定正确，没关系。
+   e 
 
   
