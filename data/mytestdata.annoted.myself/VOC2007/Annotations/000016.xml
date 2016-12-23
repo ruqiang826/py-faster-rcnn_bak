@@ -1,0 +1,26 @@
+<annotation>
+  <folder>JPEGImages</folder>
+  <filename>000016</filename>
+  <path>/home/ruqiang/github/py-faster-rcnn_ruqiang826/data/mytestdata/VOC2007/JPEGImages/000016.jpg</path>
+  <source>
+    <database>Unknown</database>
+  </source>
+  <size>
+    <width>334</width>
+    <height>500</height>
+    <depth>1</depth>
+  </size>
+  <segmented>0</segmented>
+  <object>
+    <name>bicycle</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>117</xmin>
+      <ymin>77</ymin>
+      <xmax>305</xmax>
+      <ymax>465</ymax>
+    </bndbox>
+  </object>
+</annotation>
