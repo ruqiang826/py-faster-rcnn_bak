@@ -160,7 +160,7 @@ def im_detect(net, im, boxes=None):
         # unscale back to raw image space
         boxes = rois[:, 1:5] / im_scales[0]
 
-    if cfg.TEST.SVM:
+    if cfg.TEST.SVM: # False
         # use the raw scores before softmax under the assumption they
         # were trained as linear SVMs
         scores = net.blobs['cls_score'].data
@@ -168,7 +168,7 @@ def im_detect(net, im, boxes=None):
         # use softmax estimated probabilities
         scores = blobs_out['cls_prob']
 
-    if cfg.TEST.BBOX_REG:
+    if cfg.TEST.BBOX_REG: # True
         # Apply bounding-box regression deltas
         box_deltas = blobs_out['bbox_pred']
         pred_boxes = bbox_transform_inv(boxes, box_deltas)
@@ -182,6 +182,7 @@ def im_detect(net, im, boxes=None):
         scores = scores[inv_index, :]
         pred_boxes = pred_boxes[inv_index, :]
 
+    print scores
     return scores, pred_boxes
 
 def vis_detections(im, class_name, dets, thresh=0.3):
@@ -266,7 +267,8 @@ def test_net(net, imdb, max_per_image=100, thresh=0.05, vis=False):
         #pdb.set_trace()
         # skip j = 0, because it's the background class
         box_num = 0
-        for j in xrange(1, imdb.num_classes):
+        #for j in xrange(1, imdb.num_classes):
+        for j in xrange(0, imdb.num_classes):
             inds = np.where(scores[:, j] > thresh)[0]
             cls_scores = scores[inds, j]
             cls_boxes = boxes[inds, j*4:(j+1)*4]

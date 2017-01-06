@@ -270,6 +270,5 @@ train的iter数在./experiments/scripts/faster_rcnn_end2end.sh 改
    b 想用原始数据集合抽一小部分来做。也不行。
    c 运行过程中，有些问题需要注意。一个是train和test都是有cache，一定注意清理cache，否则读取的图片是cache的结果。train文件和test文件都是在data/mytestdata/VOC2007/ImageSets/Main/trainval.txt 和test.txt里写的。所以运行要注意 拷文件、清cache、更新trainval.txt和test.txt再运行
    d 在把上面的东西都替换顺当以后，把train和test都改成了20个jpg，运行正常，可以输出region的判定结果。多数图片无结果，有结果的也不一定正确，没关系。
-   e 
-
+   e 这里的VOC2007的数据，分类一共是20个，加一个background是21个类。如果自己数据要改分类数量，在神经网络有一层是按照类别数量x4来定义的参数，在models/pascal_voc/VGG_CNN_M_1024/faster_rcnn_end2end/train.prototxt 里的bbox_pred里num_output改成类数量*4,  roi-data 的num_classes,设置类的数量。  这两个值有耦合,只设置一个会报错或core，debug了半天. 另外一个cls_score也要改
   
