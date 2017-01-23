@@ -26,11 +26,7 @@ import argparse
 from fast_rcnn.config import cfg_from_file
 
 CLASSES = ('__background__',
-           'aeroplane', 'bicycle', 'bird', 'boat',
-           'bottle', 'bus', 'car', 'cat', 'chair',
-           'cow', 'diningtable', 'dog', 'horse',
-           'motorbike', 'person', 'pottedplant',
-           'sheep', 'sofa', 'train', 'tvmonitor')
+           'king', 'eking', 'giant')
 
 NETS = {'vgg16': ('VGG16',
                   'VGG16_faster_rcnn_final.caffemodel'),
@@ -86,7 +82,7 @@ def demo(net, image_name):
     im = im[:, :, (2, 1, 0)]
     fig, ax = plt.subplots(figsize=(12, 12))
     ax.imshow(im, aspect='equal')
-    CONF_THRESH = 0.001
+    CONF_THRESH = 0.8
     NMS_THRESH = 0.3
     for cls_ind, cls in enumerate(CLASSES[1:]):
         cls_ind += 1 # because we skipped background
@@ -115,9 +111,9 @@ def parse_args():
     return args
 
 if __name__ == '__main__':
-    cfg_from_file('experiments/cfgs/faster_rcnn_end2end.yml')
+    #cfg_from_file('experiments/cfgs/faster_rcnn_end2end.yml')
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
-    cfg.PHASE = 'TEST'
+    #cfg.PHASE = 'TEST'
 
     args = parse_args()
 
@@ -158,8 +154,9 @@ if __name__ == '__main__':
     #for i in xrange(2):
     #    _, _= im_detect(net, im)
 
-    im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
-                '001763.jpg', '004545.jpg']
+    im_names = ['filename_101.jpg','filename_102.jpg','filename_103.jpg','filename_104.jpg','filename_105.jpg']
+    #im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
+    #            '001763.jpg', '004545.jpg']
     for im_name in im_names:
         print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         print 'Demo for data/demo/{}'.format(im_name)
