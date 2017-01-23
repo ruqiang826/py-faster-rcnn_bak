@@ -216,7 +216,10 @@ Test outputs are saved under:
 output/<experiment directory>/<dataset name>/<network snapshot name>/
 ```
 
-这个代码有9个月没有更新了，版本上有些问题： cudnn升级到5, 这里对应的应该是4,所以自带的caffe和cudnn不匹配了，编译不过。caffe主线上已经升级到cudnn 5了。所以可以把caffe 最新版拷过来，覆盖这里的caffe。
+这个代码有9个月没有更新了，版本上有些问题： cudnn升级到5, 这里对应的应该是4,所以自带的caffe和cudnn不匹配了，编译不过。caffe主线上已经升级到cudnn 5了。所以可以把caffe 最新版拷过来，覆盖这里的caffe。 编译时有个python头文件pyconfig.h找不到，需要 
+export CPLUS_INCLUDE_PATH=/usr/include/python2.7
+
+
 但是这里的caffe有些代码在主线里没有，需要再拷贝。 有./src/caffe/layers/smooth_L1_loss_layer* 和  ./src/caffe/layers/roi_pooling_layer.*  include/caffe/fast_rcnn_layers.hpp 
 src/caffe/proto/caffe.proto 需要加两个声明,对应上面这两个类, 重新cmake、make
 
@@ -272,3 +275,39 @@ train的iter数在./experiments/scripts/faster_rcnn_end2end.sh 改
    d 在把上面的东西都替换顺当以后，把train和test都改成了20个jpg，运行正常，可以输出region的判定结果。多数图片无结果，有结果的也不一定正确，没关系。
    e 这里的VOC2007的数据，分类一共是20个，加一个background是21个类。如果自己数据要改分类数量，在神经网络有一层是按照类别数量x4来定义的参数，在models/pascal_voc/VGG_CNN_M_1024/faster_rcnn_end2end/train.prototxt 里的bbox_pred里num_output改成类数量*4,  roi-data 的num_classes,设置类的数量。  这两个值有耦合,只设置一个会报错或core，debug了半天. 另外一个cls_score也要改
   
+
+2017.1.21 :
+关于修正caffe的问题：
+py-faster-rcnn commit号 96dc9f1,caffe用release rc4.
+
+从caffe rc4拷贝如下文件到py-faster-rcnn自带的caffe里
+cp ./include/caffe/util/cudnn.hpp ../py-faster-rcnn.orig/caffe-fast-rcnn/include/caffe/util/
+cp src/caffe/layers/cudnn_sigmoid_layer.cu ../py-faster-rcnn.orig/caffe-fast-rcnn/src/caffe/layers/ -i
+cp src/caffe/layers/cudnn_sigmoid_layer.cpp ../py-faster-rcnn.orig/caffe-fast-rcnn/src/caffe/layers/ -i
+cp include/caffe/layers/cudnn_sigmoid_layer.hpp ../py-faster-rcnn.orig/caffe-fast-rcnn/include/caffe/layers/ 
+
+cp include/caffe/layers/cudnn_relu_layer.hpp ../py-faster-rcnn.orig/caffe-fast-rcnn/include/caffe/layers/ -i
+cp src/caffe/layers/cudnn_relu_layer.c* ../py-faster-rcnn.orig/caffe-fast-rcnn/src/caffe/layers/
+
+
+cp include/caffe/layers/cudnn_tanh_layer.hpp ../py-faster-rcnn.orig/caffe-fast-rcnn/include/caffe/layers/ -i
+cp src/caffe/layers/cudnn_tanh_layer.c* ../py-faster-rcnn.orig/caffe-fast-rcnn/src/caffe/layers/
+
+然后编译还是会错，出错文件src/caffe/layers/cudnn_conv_layer.cu.里面有两个带v3后缀的函数，把"_v3"去掉,就能编译过了。这是py-faster-rcnn自带caffe支持cudnn 5的最小修改集合
+然后make pycaffe
+在py-faster-rcnn/lib 目录make
+
+修改./experiments/scripts/faster_rcnn_end2end.sh 的iter数量，如果不想用imagenet的模型初始化，可以把train的--weight那一行删掉。然后执行
+./experiments/scripts/faster_rcnn_end2end.sh  0 VGG_CNN_M_1024 pascal_voc
+
+修改 tools/demo.py 来读入训练的模型，并画图
+
+改成自己的数据,k分类(含background)：
+修改 models/pascal_voc/VGG_CNN_M_1024/faster_rcnn_end2end/train.prototxt ， 把bbox_pred 的num_output 改成 k*4,  input-data 的param_str: "'num_classes': 4",  roi-data 的 num_classes 也改成4.
+修改 models/pascal_voc/VGG_CNN_M_1024/faster_rcnn_end2end/test.prototxt 内容与train 类似.
+
+修改lib/datasets/pascal_voc.py 关于类的名字，和数据集合一致。我这里的四个类是 self._classes = ('__background__', 'king', 'eking', 'giant')
+修改 tools/demo.py 的CLASS，内容与上面pascal_voc.py类似。
+把data目录下的数据替换成自己的训练数据
+
+

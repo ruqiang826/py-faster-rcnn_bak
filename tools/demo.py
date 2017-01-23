@@ -23,6 +23,7 @@ import numpy as np
 import scipy.io as sio
 import caffe, os, sys, cv2
 import argparse
+from fast_rcnn.config import cfg_from_file
 
 CLASSES = ('__background__',
            'aeroplane', 'bicycle', 'bird', 'boat',
@@ -37,15 +38,12 @@ NETS = {'vgg16': ('VGG16',
                   'ZF_faster_rcnn_final.caffemodel')}
 
 
-def vis_detections(im, class_name, dets, thresh=0.5):
+def vis_detections(im, class_name, dets,ax, thresh=0.5):
     """Draw detected bounding boxes."""
     inds = np.where(dets[:, -1] >= thresh)[0]
     if len(inds) == 0:
         return
 
-    im = im[:, :, (2, 1, 0)]
-    fig, ax = plt.subplots(figsize=(12, 12))
-    ax.imshow(im, aspect='equal')
     for i in inds:
         bbox = dets[i, :4]
         score = dets[i, -1]
@@ -85,7 +83,10 @@ def demo(net, image_name):
            '{:d} object proposals').format(timer.total_time, boxes.shape[0])
 
     # Visualize detections for each class
-    CONF_THRESH = 0.8
+    im = im[:, :, (2, 1, 0)]
+    fig, ax = plt.subplots(figsize=(12, 12))
+    ax.imshow(im, aspect='equal')
+    CONF_THRESH = 0.001
     NMS_THRESH = 0.3
     for cls_ind, cls in enumerate(CLASSES[1:]):
         cls_ind += 1 # because we skipped background
@@ -95,7 +96,7 @@ def demo(net, image_name):
                           cls_scores[:, np.newaxis])).astype(np.float32)
         keep = nms(dets, NMS_THRESH)
         dets = dets[keep, :]
-        vis_detections(im, cls, dets, thresh=CONF_THRESH)
+        vis_detections(im, cls, dets, ax, thresh=CONF_THRESH)
 
 def parse_args():
     """Parse input arguments."""
@@ -107,13 +108,16 @@ def parse_args():
                         action='store_true')
     parser.add_argument('--net', dest='demo_net', help='Network to use [vgg16]',
                         choices=NETS.keys(), default='vgg16')
+    parser.add_argument('--model', dest='model', help='model to use')
 
     args = parser.parse_args()
 
     return args
 
 if __name__ == '__main__':
+    cfg_from_file('experiments/cfgs/faster_rcnn_end2end.yml')
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
+    cfg.PHASE = 'TEST'
 
     args = parse_args()
 
@@ -122,9 +126,22 @@ if __name__ == '__main__':
     caffemodel = os.path.join(cfg.DATA_DIR, 'faster_rcnn_models',
                               NETS[args.demo_net][1])
 
+    prototxt = 'models/pascal_voc/VGG_CNN_M_1024/faster_rcnn_end2end/test.prototxt'
+    caffemodel = '/home/ruqiang/github/py-faster-rcnn_ruqiang826/output/faster_rcnn_end2end/voc_2007_trainval/vgg_cnn_m_1024_faster_rcnn_iter_100.caffemodel'
+    caffemodel = args.model
+
     if not os.path.isfile(caffemodel):
         raise IOError(('{:s} not found.\nDid you run ./data/script/'
                        'fetch_faster_rcnn_models.sh?').format(caffemodel))
+
+
+#W0119 17:17:05.014006  4911 _caffe.cpp:125] Net('/home/ruqiang/github/py-faster-rcnn_ruqiang826/models/pascal_voc/VGG16/faster_rcnn_alt_opt/faster_rcnn_test.pt', 1, weights='/home/ruqiang/github/py-faster-rcnn_ruqiang826/output/faster_rcnn_end2end/voc_2007_trainval/vgg_cnn_m_1024_faster_rcnn_iter_70000.caffemodel')
+#I0119 17:17:05.046576  4911 upgrade_proto.cpp:67] Attempting to upgrade input file specified using deprecated input fields: /home/ruqiang/github/py-faster-rcnn_ruqiang826/models/pascal_voc/VGG16/faster_rcnn_alt_opt/faster_rcnn_test.pt
+#I0119 17:17:05.046669  4911 upgrade_proto.cpp:70] Successfully upgraded file specified using deprecated input fields.
+#W0119 17:17:05.046691  4911 upgrade_proto.cpp:72] Note that future Caffe releases will only support input layers and not input fields.
+#I0119 17:17:05.046960  4911 net.cpp:58] Initializing net from parameters: 
+#name: "VGG_ILSVRC_16_layers"
+
 
     if args.cpu_mode:
         caffe.set_mode_cpu()
@@ -138,8 +155,8 @@ if __name__ == '__main__':
 
     # Warmup on a dummy image
     im = 128 * np.ones((300, 500, 3), dtype=np.uint8)
-    for i in xrange(2):
-        _, _= im_detect(net, im)
+    #for i in xrange(2):
+    #    _, _= im_detect(net, im)
 
     im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
                 '001763.jpg', '004545.jpg']

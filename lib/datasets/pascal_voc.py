@@ -34,7 +34,7 @@ class pascal_voc(imdb):
         #                 'bottle', 'bus', 'car', 'cat', 'chair',
         #                 'cow', 'diningtable', 'dog', 'horse',
         #                 'motorbike', 'person', 'pottedplant',
-        #                 'tvmonitor', 'king', 'eking', 'giant','x')
+        #                 'tvmonitor', 'aeroplane', 'boat', 'sheep')
         self._classes = ('__background__', # always index 0
                          'king', 'eking', 'giant')
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))

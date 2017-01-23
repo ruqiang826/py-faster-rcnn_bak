@@ -29,6 +29,8 @@ class ProposalLayer(caffe.Layer):
         anchor_scales = layer_params.get('scales', (8, 16, 32))
         self._anchors = generate_anchors(scales=np.array(anchor_scales))
         self._num_anchors = self._anchors.shape[0]
+        
+        self.phase = cfg.PHASE
 
         if DEBUG:
             print 'feat_stride: {}'.format(self._feat_stride)
@@ -62,7 +64,7 @@ class ProposalLayer(caffe.Layer):
             'Only single item batches are supported'
 
         cfg_key = str(self.phase) # either 'TRAIN' or 'TEST'
-        cfg_key = "TRAIN"
+
         pre_nms_topN  = cfg[cfg_key].RPN_PRE_NMS_TOP_N
         post_nms_topN = cfg[cfg_key].RPN_POST_NMS_TOP_N
         nms_thresh    = cfg[cfg_key].RPN_NMS_THRESH
